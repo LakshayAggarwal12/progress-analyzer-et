@@ -1,5 +1,5 @@
-const QuizResult = require('../models/QuizResult');
-const { generateQuiz } = require('../services/geminiService');
+const QuizResult = require('../models/quizresult');
+const { generateQuiz } = require('../services/geminiservice');
 
 // @desc    Generate quiz questions
 // @route   POST /api/quiz/generate

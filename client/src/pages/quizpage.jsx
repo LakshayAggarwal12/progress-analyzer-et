@@ -5,7 +5,7 @@ import QuizTimer from '../components/quiz/QuizTimer';
 import QuizResult from '../components/quiz/QuizResult';
 import { useTabLock } from '../hooks/useTabLock';
 import { quizAPI } from '../api/quizAPI';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/authcontext';
 
 const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);

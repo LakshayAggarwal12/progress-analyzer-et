@@ -3,8 +3,8 @@ const {
   generateQuizQuestions, 
   submitQuiz, 
   getQuizHistory 
-} = require('../controllers/quizController');
-const { protect } = require('../middleware/authMiddleware');
+} = require('../controllers/quizcontroller');
+const { protect } = require('../middleware/authmiddleware');
 
 const router = express.Router();
 
