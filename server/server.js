@@ -1,37 +1,45 @@
 const express = require('express');
+const http = require('http');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
+const setupSocket = require('./socket/sockethandler');
+const errorHandler = require('./middleware/errorhandler');
+const { apiLimiter, authLimiter } = require('./middleware/ratelimiter');
 
 dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
+// Setup socket
+setupSocket(server);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
-app.use(limiter);
+app.use('/api', apiLimiter);
 
 // Routes
-app.use('/api/auth', require('./routes/authroutes'));
+app.use('/api/auth', authLimiter, require('./routes/authroutes'));
 app.use('/api/quiz', require('./routes/quizroutes'));
+app.use('/api/logs', require('./routes/logroutes'));
+app.use('/api/progress', require('./routes/progressroutes'));
+app.use('/api/roadmap', require('./routes/roadmaproutes'));
+app.use('/api/peers', require('./routes/peerroutes'));
 
-// Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'Progress Analyser API is running' });
 });
 
-const PORT = process.env.PORT || 5000;
+// Error handler (must be last)
+app.use(errorHandler);
 
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
